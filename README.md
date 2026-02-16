@@ -291,3 +291,4 @@ For issues or questions, please create an issue in the repository.
 ---
 
 **Built with ❤️ using Django and Tailwind CSS**
+.
