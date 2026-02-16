@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Task Manager{% endblock %}</title>
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Custom animations and transitions */
+        .task-card {
+            transition: all 0.3s ease;
+        }
+        
+        .task-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .checkbox-custom {
+            transition: all 0.2s ease;
+        }
+        
+        .checkbox-custom:checked {
+            background-color: #6366f1;
+        }
+        
+        /* Smooth fade-in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-tasks text-indigo-600 text-2xl mr-3"></i>
+                    <h1 class="text-2xl font-bold text-slate-800">
+                        Task Manager
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'task_list' %}"  
+                       class="text-slate-600 hover:text-indigo-600 transition duration-200">
+                        <i class="fas fa-home mr-1"></i> Home
+                    </a>
+                    <a href="{% url 'task_create' %}" 
+                       class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition duration-200 shadow-sm hover:shadow-md">
+                        <i class="fas fa-plus mr-1"></i> New Task
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <p class="text-center text-slate-500 text-sm">
+                &copy; 2026 Task Manager. Built with Django & Tailwind CSS
+            </p>
+        </div>
+    </footer>
+    
+    <!-- JavaScript for AJAX Toggle -->
+    <script>
+        /**
+         * Toggle task completion status via AJAX
+         * @param {number} taskId - The ID of the task to toggle
+         * @param {HTMLElement} checkbox - The checkbox element that triggered the event
+         */
+        function toggleTask(taskId, checkbox) {
+            // Get CSRF token from cookie
+            const csrftoken = getCookie('csrftoken');
+            
+            fetch(`/task/${taskId}/toggle/`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the task card appearance
+                    const taskCard = checkbox.closest('.task-card');
+                    const taskTitle = taskCard.querySelector('.task-title');
+                    
+                    if (data.is_completed) {
+                        taskCard.classList.add('opacity-75', 'bg-slate-100');
+                        taskTitle.classList.add('line-through', 'text-slate-500');
+                    } else {
+                        taskCard.classList.remove('opacity-75', 'bg-slate-100');
+                        taskTitle.classList.remove('line-through', 'text-slate-500');
+                    }
+                    
+                    // Reload page to update statistics (smooth approach)
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 300);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Revert checkbox state on error
+                checkbox.checked = !checkbox.checked;
+            });
+        }
+        
+        /**
+         * Get cookie value by name
+         * @param {string} name - The name of the cookie
+         * @returns {string|null} The cookie value or null
+         */
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+    
+    {% block extra_js %}
+    {% endblock %}
+</body>
+</html>
