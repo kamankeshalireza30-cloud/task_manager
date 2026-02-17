@@ -1,10 +1,31 @@
+"""
+Task Management System - URL Configuration
+==========================================
+This module defines all URL patterns for the task management application.
+"""
+
 from django.urls import path
-from . import views
+from .views import (
+    TaskListView,
+    TaskCreateView,
+    TaskUpdateView,
+    TaskDeleteView,
+    TaskToggleCompleteView
+)
 
 urlpatterns = [
-    path('', views.TaskListView.as_view(), name='task_list'),
-    path('create/', views.TaskCreateView.as_view(), name='task_create'),
-    path('<int:pk>/update/', views.TaskUpdateView.as_view(), name='task_update'),
-    path('<int:pk>/delete/', views.TaskDeleteView.as_view(), name='task_delete'),
-    path('toggle/<int:pk>/', views.toggle_complete, name='toggle_complete'),
+    # Task List - Home page
+    path('', TaskListView.as_view(), name='task-list'),
+    
+    # Create new task
+    path('task/new/', TaskCreateView.as_view(), name='task-create'),
+    
+    # Update existing task
+    path('task/<int:pk>/edit/', TaskUpdateView.as_view(), name='task-update'),
+    
+    # Delete task
+    path('task/<int:pk>/delete/', TaskDeleteView.as_view(), name='task-delete'),
+    
+    # Toggle task completion (AJAX endpoint)
+    path('task/<int:pk>/toggle/', TaskToggleCompleteView.as_view(), name='task-toggle'),
 ]
