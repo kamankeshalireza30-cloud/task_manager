@@ -1,39 +1,29 @@
-"""
-Task Management System - Admin Configuration
-============================================
-This module configures the Django admin interface for the Task model.
-"""
-
+# tasks/admin.py
 from django.contrib import admin
 from .models import Task
-
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
     """
     Admin configuration for Task model
-    
-    Features:
-        - List display with key fields
-        - Filtering by completion status and creation date
-        - Search functionality
-        - Read-only timestamp field
     """
-    
-    list_display = ('title', 'is_completed', 'created_at')
-    list_filter = ('is_completed', 'created_at')
-    search_fields = ('title', 'description')
-    readonly_fields = ('created_at',)
+    list_display = ['title', 'user', 'completed', 'created_at']
+    list_filter = ['completed', 'created_at', 'user']
+    search_fields = ['title', 'description', 'user__username']
+    list_editable = ['completed']
+    list_per_page = 20
     
     fieldsets = (
         ('Task Information', {
-            'fields': ('title', 'description')
+            'fields': ('user', 'title', 'description')
         }),
         ('Status', {
-            'fields': ('is_completed',)
+            'fields': ('completed',)
         }),
-        ('Metadata', {
-            'fields': ('created_at',),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
             'classes': ('collapse',)
         }),
     )
+    
+    readonly_fields = ['created_at', 'updated_at']
