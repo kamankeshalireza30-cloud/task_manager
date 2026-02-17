@@ -116,3 +116,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+LOGIN_URL = 'login'  # اسم URL لاگین
+LOGIN_REDIRECT_URL = 'task-list'  # بعد از لاگین کجا بره
+LOGOUT_REDIRECT_URL = 'login'  # بعد از خروج کجا بره

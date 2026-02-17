@@ -1,10 +1,6 @@
-"""
-Task Management System - URL Configuration
-==========================================
-This module defines all URL patterns for the task management application.
-"""
-
+# tasks/urls.py
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from .views import (
     TaskListView,
     TaskCreateView,
@@ -14,18 +10,14 @@ from .views import (
 )
 
 urlpatterns = [
-    # Task List - Home page
+    # Auth URLs - اضافه کردن صفحات لاگین و رجیستر
+    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    
+    # Task URLs
     path('', TaskListView.as_view(), name='task-list'),
-    
-    # Create new task
     path('task/new/', TaskCreateView.as_view(), name='task-create'),
-    
-    # Update existing task
     path('task/<int:pk>/edit/', TaskUpdateView.as_view(), name='task-update'),
-    
-    # Delete task
     path('task/<int:pk>/delete/', TaskDeleteView.as_view(), name='task-delete'),
-    
-    # Toggle task completion (AJAX endpoint)
     path('task/<int:pk>/toggle/', TaskToggleCompleteView.as_view(), name='task-toggle'),
 ]
